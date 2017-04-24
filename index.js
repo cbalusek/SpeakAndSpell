@@ -1,13 +1,8 @@
 'use strict';
 var Alexa = require("alexa-sdk");
 var appId = 'amzn1.ask.skill.23a1da17-7f0b-4d47-b71f-367f3be4e85d'; //'amzn1.echo-sdk-ams.app.your-skill-id';
-//var spellingWord = 'ABOVE';
-//var spellingWord = '';
-//var spellingWordWithDots = 'A.B.O.V.E.'
-//var numberOfWords = 0;
-//var numberOfCorrectWords = 0;
-var levelAWords = ['ABOVE', 'ANGEL', 'ANSWER', 'CALF', 'DOES', 'EARTH', 'ECHO', 'EXTRA', 'FIVE', 'FOR', 'FOUR', 'GUESS', 'HALF', 'HEALTH', 'IRON', 'LEARN', 'NINE', 'OCEAN', 'ONCE', 'ONE', 'OVEN', 'PINT', 'PULL', 'RANGE', 'SAYS', 'SIX', 'SKI', 'SURE', 'SWAP', 'TALK', 'TEN', 'THREE','TOUCH', 'VIEW', 'WARM', 'WAS', 'WASH', 'WORD', 'ZERO'];
-//var levelAWords = ['ABOVE', 'ANGEL', 'ANSWER', 'CALF', 'DOES', 'EARTH', 'ECHO', 'EXTRA', 'FIVE', 'GUESS', 'HALF', 'HEALTH', 'IRON', 'LEARN', 'NINE', 'OCEAN', 'ONCE', 'ONE', 'OVEN', 'PINT', 'PULL', 'RANGE', 'SAYS', 'SIX', 'SKI', 'SURE', 'SWAP', 'TALK', 'TEN', 'THREE', 'TO', 'TOUCH', 'TWO', 'VIEW', 'WARM', 'WAS', 'WASH', 'WORD', 'ZERO'];
+//var levelAWords = ['ABOVE', 'ANGEL', 'ANSWER', 'CALF', 'DOES', 'EARTH', 'ECHO', 'EXTRA', 'FIVE', 'FOR', 'FOUR', 'GUESS', 'HALF', 'HEALTH', 'IRON', 'LEARN', 'NINE', 'OCEAN', 'ONCE', 'ONE', 'OVEN', 'PINT', 'PULL', 'RANGE', 'SAYS', 'SIX', 'SKI', 'SURE', 'SWAP', 'TALK', 'TEN', 'THREE','TOUCH', 'VIEW', 'WARM', 'WAS', 'WASH', 'WORD', 'ZERO'];
+var levelAWords = ['ABOVE', 'ANGEL', 'ANSWER', 'CALF', 'DOES', 'EARTH', 'ECHO', 'EXTRA', 'FIVE', 'GUESS', 'HALF', 'HEALTH', 'IRON', 'LEARN', 'NINE', 'OCEAN', 'ONCE', 'ONE', 'OVEN', 'PINT', 'PULL', 'RANGE', 'SAYS', 'SIX', 'SKI', 'SURE', 'SWAP', 'TALK', 'TEN', 'THREE', 'TO', 'TOUCH', 'TWO', 'VIEW', 'WARM', 'WAS', 'WASH', 'WORD', 'ZERO'];
 //Commented out level A words is original list and includes homynyms FOR, FOUR, TWO, and TO.  In future version, I will take care of managing for those
 var levelBWords = ['ANOTHER', 'BEAUTY','BEIGE','BLOOD','BULLET','CARRY','CHALK','CHILD','DANGER','EARLY','EIGHT','FLOOD','FLOOR','FRONT','GUIDE','HASTE','HEAVEN','LINGER','MIRROR','OTHER','PRIEST','READY','RURAL','SCHOOL','SEVEN','SQUAD','SQUAT','SUGAR','TODAY','UNION','WATCH','WATER','YIELD'];
 var levelCWords = ['ALREADY','BELIEVE','BUILT','BUSHEL','COMFORT','COMING','COUPLE','COUSIN','ENOUGH','FINGER','GUARD','HEALTHY','HEAVY','INSTEAD','LAUGH','MEASURE','MOTHER','NIECE','OUTDOOR','PERIOD','PLAGUE','POLICE','PROMISE','QUIET','RANGER','RELIEF','REMOVE','SEARCH','SHIELD','SHOULD','SHOVEL','SOMEONE','SOURCE','STATUE','TERROR','TROUBLE','WELCOME','WOLVES','WOMAN','WONDER','WORTH'];
@@ -15,19 +10,17 @@ var levelDWords = ['ABSCESS','ANCIENT','ANYTHING','BROTHER','BUREAU','BUTCHER','
 //For level D words, I skipped couldn't - will add it another time
 
 var wordArray = [''];
-var maxWords = 2; //set if you want a shorter game for testing
+var maxWords = 10; //set if you want a shorter game for testing
 var speechOutput = '';
 var levelMessage = 'You will need to pick a level to continue.  You can pick Level A, which is the easiest,  B.,  C., or  D., which is the hardest.  Which level would you like?';
 var levelReprompt = 'Say A, B, C, or D.'
 
-
+ 
 
 
 exports.handler = function(event, context, callback) {
     var alexa = Alexa.handler(event, context);
     alexa.appId = appId;
-    //alexa.dynamoDBTableName = 'highLowGuessUsers';
-    //alexa.registerHandlers(newSessionHandlers, guessModeHandlers, startGameHandlers, guessAttemptHandlers);
     alexa.registerHandlers(newSessionHandlers, guessModeHandlers, startGameHandlers, levelHandlers);
     alexa.execute();
 };
@@ -46,7 +39,7 @@ var newSessionHandlers = {
             this.attributes['endedSessionCount'] = 0;
             this.attributes['gamesPlayed'] = 0;
         }
-       // numberOfWords = 0;
+      
         var speechOutput = '';
         this.handler.state = states.STARTMODE;
         this.emit(':ask', 'Welcome to speak and spell. would you like to play?',
@@ -61,7 +54,6 @@ var newSessionHandlers = {
     },
     'SessionEndedRequest': function () {
         console.log('session ended!');
-        //this.attributes['endedSessionCount'] += 1;
         this.emit(":tell", "Goodbye!");
     }
 };
@@ -76,20 +68,10 @@ var startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
         this.emit(':ask', message, message);
     },
     "AMAZON.YesIntent": function() {
-      //  this.attributes["guessNumber"] = Math.floor(Math.random() * 100);
         console.log('yes intent is working');
-        //var numberOfWords = 0;
-       // console.log('number of words in yes intent ' + numberOfWords);
-       // var numberOfCorrectWords = 0;
-        //var spellingWord = '';
-        //var speechOutput = '';
-     //   this.handler.state = states.GUESSMODE;
         this.handler.state = states.LEVELMODE;
-        //wordArray = levelAWords;
-        this.emitWithState(':ask', levelMessage, levelMessage);
-        //this.emit(':tell', 'cool it is working');
-      // this.attributes['tries'] = 0;
-      //  this.emit(':ask', 'Great! ' + 'Spell' + spellingWord, 'Try again.  Spell' + spellingWord);
+        this.emitWithState(':ask', levelMessage, levelReprompt);
+
     },
 
 
@@ -107,7 +89,6 @@ var startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
     },
     'SessionEndedRequest': function () {
         console.log("SESSIONENDEDREQUEST");
-        //this.attributes['endedSessionCount'] += 1;
         this.emit(':tell', "Goodbye!");
     },
     'Unhandled': function() {
@@ -125,7 +106,7 @@ var levelHandlers = Alexa.CreateStateHandler(states.LEVELMODE, {
         this.emit('NewSession'); // Uses the handler in newSessionHandlers
     },
     'AMAZON.HelpIntent': function() {
-        this.emit(':ask', levelMessage, levelMessage);
+        this.emit(':ask', levelMessage, levelReprompt);
     },
 
     "LevelIntent": function() {
@@ -186,7 +167,7 @@ var levelHandlers = Alexa.CreateStateHandler(states.LEVELMODE, {
     },
     'Unhandled': function() {
         console.log("UNHANDLED - level");
-        this.emit(':ask', levelMessage, levelMessage);
+        this.emit(':ask', levelMessage, levelReprompt);
     }
 });
 
@@ -200,10 +181,7 @@ var guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
 
     'ClearIntent':  function(){
         this.attributes['spellingWord'] = '';
-       // var spellingWord = '';
         this.attributes['numberOfWords'] = 0;
-        //var wordArray = levelAWords;
-       // var numberOfCorrectWords = 0;
         this.attributes['numberOfCorrectWords'] = 0;
         console.log('All clear');
         speechOutput = '';
@@ -229,13 +207,11 @@ var guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
         if ( this.attributes['numberOfWords'] < (maxWords + 1)) {
             speechOutput = speechOutput + '<s>Spell ' + this.attributes['spellingWord']+'</s>'; 
             console.log('speechOutput = '+ speechOutput);
-           // this.emit(':ask', 'Great! ' + 'Spell ' + spellingWord, 'Try again.  Spell ' + spellingWord);
            this.emit(':ask', speechOutput, 'Try again.  Spell ' + this.attributes['spellingWord']);
         }  else {
             console.log('Max words hit');
             speechOutput = speechOutput + '<s>Game over!</s>  You got ' + this.attributes['numberOfCorrectWords'] + ' out of ' + maxWords + ' correct.';
             console.log('speechoutput is ' + speechOutput);
-           // this.handler.state = states.STARTMODE;
             this.emit(':tell', speechOutput);
         }
         
@@ -244,9 +220,9 @@ var guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
   
    'GuessIntent': function() {
         console.log('GuessIntent');
-     // var guessNum = parseInt(this.event.request.intent.slots.number.value);
+  
         var guess = (this.event.request.intent.slots.Answer.value);
-      //  var targetNum = this.attributes["guessNumber"];
+
         console.log('user guessed: ' + guess);
         if (guess == this.attributes['spellingWord'])  {
             console.log('Word is spelled right');
@@ -258,20 +234,7 @@ var guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
             console.log('numberOfCorrectWords = ' + this.attributes['numberOfCorrectWords']);
             this.emitWithState('WordIntent');}
         else {this.emitWithState('Unhandled');}
- /* 
-        if(guessNum > targetNum){
-            this.emit('TooHigh', guessNum);
-        } else if( guessNum < targetNum){
-            this.emit('TooLow', guessNum);
-        } else if (guessNum === targetNum){
-            // With a callback, use the arrow function to preserve the correct 'this' context
-            this.emit('JustRight', () => {
-                this.emit(':ask', guessNum.toString() + 'is correct! Would you like to play a new game?',
-                'Say yes to start a new game, or no to end the game.');
-        })
-        } else {
-            this.emit('NotANum');
-        }*/
+
     },
     'AMAZON.HelpIntent': function() {
         this.emit(':ask', 'I am thinking of a number between zero and one hundred, try to guess and I will tell you' +
@@ -296,10 +259,6 @@ var guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
         this.attributes['tries']++;
         console.log('tries = ' + this.attributes['tries']);
 
-        
-      //  var targetNum = this.attributes["guessNumber"];
-      // var guess = (this.event.request.intent.slots.Answer.value);
-      // console.log('user guessed: ' + guess);
         if (this.attributes['tries'] < 2){
             this.emit(':ask', 'That is incorrect.  Try again.  Spell ' + this.attributes['spellingWord']);
         }
@@ -312,25 +271,6 @@ var guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
             }
     }
 });
-
-// These handlers are not bound to a state
-/*
-var guessAttemptHandlers = {
-    'TooHigh': function(val) {
-        this.emit(':ask', val.toString() + ' is too high.', 'Try saying a smaller number.');
-    },
-    'TooLow': function(val) {
-        this.emit(':ask', val.toString() + ' is too low.', 'Try saying a larger number.');
-    },
-    'JustRight': function(callback) {
-        this.handler.state = states.STARTMODE;
-        this.attributes['gamesPlayed']++;
-        callback();
-    },
-    'NotANum': function() {
-        this.emit(':ask', 'Sorry, I didn\'t get that. Try saying a number.', 'Try saying a number.');
-    }
-};*/
 
 function addPeriods(bigWord){
     var numberCharacters = bigWord.length;
